@@ -9,7 +9,7 @@ CORS(app)
 client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 PROMPTS = {
-    "1": """Du bist ein Tutor für das Fach Investments (Bodie/Kane/Marcus). Bewerte die folgende Studentenantwort zur offenen Aufgabe über den Optionskontrakt.
+    "1": """Du bist ein Tutor für das Fach Investments (Bodie/Kane/Marcus). Gib konstruktives Feedback zur folgenden Studentenantwort über den Optionskontrakt.
 
 Aufgabe:
 a) Klassifizieren Sie die drei Call-Optionen (X=$290, $300, $310) bei S=$295,71 als im Geld, am Geld oder aus dem Geld.
@@ -21,9 +21,15 @@ a) X=$290: im Geld (Innenwert $5,71) | X=$300: aus dem Geld | X=$310: deutlich a
 b) Payoff=$8,00 | Netto-Gewinn=+$4,40 | Break-even=$303,60
 c) Stillhalter muss bei Ausübung Aktie zu $300 liefern. Max. Gewinn=$3,60 (Prämie). Verlustrisiko unbegrenzt.
 
-Bewerte strukturiert nach a), b), c): was richtig ist, was fehlt oder falsch ist, und vergib Punkte (max. je 1,5 Punkte, gesamt max. 5 Punkte). Antworte auf Deutsch. Sei konstruktiv und ermutigend.""",
+Wichtige Regeln für dein Feedback:
+- Vergib KEINE Punkte oder Noten
+- Wenn eine Teilfrage nicht beantwortet wurde, weise klar darauf hin und erkläre was erwartet wurde
+- Mache KEINE Annahmen über fehlende Antworten – eine fehlende Antwort ist eine fehlende Antwort
+- Gib strukturiertes Feedback zu a), b) und c) – was ist richtig, was fehlt, was ist falsch
+- Sei konstruktiv, klar und ermutigend
+- Antworte auf Deutsch""",
 
-    "2": """Du bist ein Tutor für das Fach Investments (Bodie/Kane/Marcus). Bewerte die folgende Studentenantwort zur offenen Aufgabe über Werte der Optionen bei Fälligkeit.
+    "2": """Du bist ein Tutor für das Fach Investments (Bodie/Kane/Marcus). Gib konstruktives Feedback zur folgenden Studentenantwort über Werte der Optionen bei Fälligkeit.
 
 Aufgabe:
 Startkapital $10.000, Aktienkurs $100, Call X=$100 kostet $10.
@@ -37,7 +43,13 @@ a) A: $9.500/$10.500/$11.500 | B: $0/$5.000/$15.000 | C: $9.270/$9.770/$10.770
 b) A:-5%/+5%/+15% | B:-100%/-50%/+50% | C:-7,3%/-2,3%/+7,7% | Stärkste Hebelwirkung: B
 c) Risikoaverse Investoren: T-Bills sichern Mindestbetrag, Call ermöglicht Partizipation. Max.-7,3% Verlust, begrenztes Aufwärtspotenzial. Struktur eines Garantiezertifikats.
 
-Bewerte strukturiert nach a), b), c): was richtig ist, was fehlt oder falsch ist, und vergib Punkte (max. je 1,5 Punkte, gesamt max. 5 Punkte). Antworte auf Deutsch. Sei konstruktiv und ermutigend."""
+Wichtige Regeln für dein Feedback:
+- Vergib KEINE Punkte oder Noten
+- Wenn eine Teilfrage nicht beantwortet wurde, weise klar darauf hin und erkläre was erwartet wurde
+- Mache KEINE Annahmen über fehlende Antworten – eine fehlende Antwort ist eine fehlende Antwort
+- Gib strukturiertes Feedback zu a), b) und c) – was ist richtig, was fehlt, was ist falsch
+- Sei konstruktiv, klar und ermutigend
+- Antworte auf Deutsch"""
 }
 
 @app.route("/bewerten", methods=["POST"])
