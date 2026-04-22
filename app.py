@@ -70,7 +70,46 @@ Formatiere deine Antwort als HTML (kein Markdown). Verwende folgende Elemente:
 Gib NUR den HTML-Inhalt zurück, kein <!DOCTYPE>, kein <html>, kein <body>."""
 }
 
-@app.route("/bewerten", methods=["POST"])
+def md_to_html(text):
+    import re
+    # Tabellen entfernen (zu komplex, einfach weglassen)
+    text = re.sub(r'\|.*\|.*\n', '', text)
+    text = re.sub(r'\|[-| ]+\|\n', '', text)
+    # Horizontale Linien entfernen
+    text = re.sub(r'\n---+\n', '\n', text)
+    # H2 ## 
+    text = re.sub(r'(?m)^## (.+)$', r'<h3 style="color:#1a3a6b;font-size:14px;font-weight:600;margin:1rem 0 .3rem">\1</h3>', text)
+    # H1 #
+    text = re.sub(r'(?m)^# (.+)$', r'<h2 style="color:#1a1916;font-size:15px;font-weight:600;margin:.5rem 0 .5rem">\1</h2>', text)
+    # Fettdruck **text**
+    text = re.sub(r'\*\*(.+?)\*\*', r'<strong>\1</strong>', text)
+    # ✓ grün
+    text = re.sub(r'✓ ?(.+)', r'<span style="color:#1a6640">✓ \1</span>', text)
+    # ✗ rot
+    text = re.sub(r'✗ ?(.+)', r'<span style="color:#8b1a1a">✗ \1</span>', text)
+    # Listenpunkte - item
+    lines = text.split('\n')
+    result = []
+    in_list = False
+    for line in lines:
+        if re.match(r'^- ', line):
+            if not in_list:
+                result.append('<ul style="margin:.3rem 0 .3rem 1.2rem">')
+                in_list = True
+            result.append('<li>' + line[2:] + '</li>')
+        else:
+            if in_list:
+                result.append('</ul>')
+                in_list = False
+            if line.strip() == '':
+                result.append('')
+            else:
+                result.append('<p style="margin:.2rem 0">' + line + '</p>')
+    if in_list:
+        result.append('</ul>')
+    return '\n'.join(result)
+
+
 def bewerten():
     data = request.get_json()
     aufgabe = str(data.get("aufgabe", ""))
@@ -93,7 +132,7 @@ def bewerten():
         ]
     )
 
-    return jsonify({"bewertung": message.content[0].text, "html": True})
+    return jsonify({"bewertung": md_to_html(message.content[0].text), "html": True})
 
 @app.route("/")
 def index():
