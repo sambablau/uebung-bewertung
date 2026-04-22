@@ -47,14 +47,25 @@ b) Covered Call: X=$110, Prämie $4. Payoff-Tabelle für S_T=$80,$110,$120. Maxi
 c) Vergleich: Welche schützt vor Verlusten, welche begrenzt Gewinne? Unterschied in der Anlegermentalität?
 
 Musterlösung:
-a) S_T=$80: Aktie $80 + Put $15 = $95 | S_T=$95: $95+$0=$95 | S_T=$110: $110+$0=$110. Min. Payoff=$95.
-b) S_T=$80: $80+$0=$80 | S_T=$110: $110+$0=$110 | S_T=$120: $120−$10=$110. Max. Payoff=$110.
-c) Protective Put schützt nach unten (kostet Prämie, unbegrenzte Gewinne). Covered Call generiert Einnahmen, begrenzt aber Gewinne auf X. Unterschied: Schutz vs. Einkommenserzielung.
+a) Protective Put – Payoff (ohne Prämie):
+S_T=$80: Aktie $80 + Put $15 = Payoff $95 | Netto-Gewinn = $95 - $100 - $3 = -$8
+S_T=$95: Aktie $95 + Put $0 = Payoff $95 | Netto-Gewinn = $95 - $100 - $3 = -$8
+S_T=$110: Aktie $110 + Put $0 = Payoff $110 | Netto-Gewinn = $110 - $100 - $3 = +$7
+Minimaler Payoff = $95 (= X). Die Frage fragt nach dem Payoff, NICHT nach dem Netto-Gewinn.
+
+b) Covered Call – Payoff (ohne Prämie):
+S_T=$80: Aktie $80 + Short Call $0 = Payoff $80 | Netto-Gewinn = $80 - $100 + $4 = -$16
+S_T=$110: Aktie $110 + Short Call $0 = Payoff $110 | Netto-Gewinn = $110 - $100 + $4 = +$14
+S_T=$120: Aktie $120 - Call $10 = Payoff $110 | Netto-Gewinn = $110 - $100 + $4 = +$14
+Maximaler Payoff = $110 (= X). Die Prämie von $4 ist NICHT Teil des Payoffs. Die Frage fragt nach dem Payoff, NICHT nach dem Netto-Gewinn.
+
+c) Protective Put schützt nach unten (Mindest-Payoff = X), lässt unbegrenzte Gewinne zu, kostet Prämie. Covered Call generiert Prämieneinnahmen, begrenzt aber Gewinne auf X. Protective Put = Versicherungsmentalität. Covered Call = Einkommenserzielung mit Verkaufsdisziplin.
 
 Wichtige Regeln:
 - Vergib KEINE Punkte oder Noten
-- Fehlende Antworten klar als fehlend kennzeichnen, keine Annahmen
-- Feedback zu a), b), c) – was richtig, was fehlt, was falsch
+- Gib IMMER Feedback zu ALLEN drei Teilen a), b) und c) – auch wenn eine Teilfrage fehlt
+- Wenn eine Teilfrage fehlt: schreibe explizit "Diese Teilfrage wurde nicht beantwortet." und erkläre kurz was erwartet wurde
+- Mache KEINE Annahmen über fehlende Antworten
 - Konstruktiv, klar, ermutigend, auf Deutsch
 
 Formatiere als HTML:
@@ -82,8 +93,9 @@ c) Straddle: Wette auf hohe Volatilität (egal ob rauf oder runter). Bullen-Spre
 
 Wichtige Regeln:
 - Vergib KEINE Punkte oder Noten
-- Fehlende Antworten klar als fehlend kennzeichnen, keine Annahmen
-- Feedback zu a), b), c) – was richtig, was fehlt, was falsch
+- Gib IMMER Feedback zu ALLEN drei Teilen a), b) und c) – auch wenn eine Teilfrage fehlt
+- Wenn eine Teilfrage fehlt: schreibe explizit "Diese Teilfrage wurde nicht beantwortet." und erkläre kurz was erwartet wurde
+- Mache KEINE Annahmen über fehlende Antworten
 - Konstruktiv, klar, ermutigend, auf Deutsch
 
 Formatiere als HTML:
