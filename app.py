@@ -27,7 +27,16 @@ Wichtige Regeln für dein Feedback:
 - Mache KEINE Annahmen über fehlende Antworten – eine fehlende Antwort ist eine fehlende Antwort
 - Gib strukturiertes Feedback zu a), b) und c) – was ist richtig, was fehlt, was ist falsch
 - Sei konstruktiv, klar und ermutigend
-- Antworte auf Deutsch""",
+- Antworte auf Deutsch
+
+Formatiere deine Antwort als HTML (kein Markdown). Verwende folgende Elemente:
+- Überschriften: <h3 style="color:#1a3a6b;font-size:15px;margin:1rem 0 .3rem">Titel</h3>
+- Fettdruck: <strong>Text</strong>
+- Aufzählungen: <ul style="margin:.3rem 0 .3rem 1.2rem"><li>Punkt</li></ul>
+- Absätze: <p style="margin:.3rem 0">Text</p>
+- Positives Feedback: <span style="color:#1a6640">✓ Text</span>
+- Fehlendes/Falsches: <span style="color:#8b1a1a">✗ Text</span>
+Gib NUR den HTML-Inhalt zurück, kein <!DOCTYPE>, kein <html>, kein <body>.""",
 
     "2": """Du bist ein Tutor für das Fach Investments (Bodie/Kane/Marcus). Gib konstruktives Feedback zur folgenden Studentenantwort über Werte der Optionen bei Fälligkeit.
 
@@ -49,7 +58,16 @@ Wichtige Regeln für dein Feedback:
 - Mache KEINE Annahmen über fehlende Antworten – eine fehlende Antwort ist eine fehlende Antwort
 - Gib strukturiertes Feedback zu a), b) und c) – was ist richtig, was fehlt, was ist falsch
 - Sei konstruktiv, klar und ermutigend
-- Antworte auf Deutsch"""
+- Antworte auf Deutsch
+
+Formatiere deine Antwort als HTML (kein Markdown). Verwende folgende Elemente:
+- Überschriften: <h3 style="color:#1a3a6b;font-size:15px;margin:1rem 0 .3rem">Titel</h3>
+- Fettdruck: <strong>Text</strong>
+- Aufzählungen: <ul style="margin:.3rem 0 .3rem 1.2rem"><li>Punkt</li></ul>
+- Absätze: <p style="margin:.3rem 0">Text</p>
+- Positives Feedback: <span style="color:#1a6640">✓ Text</span>
+- Fehlendes/Falsches: <span style="color:#8b1a1a">✗ Text</span>
+Gib NUR den HTML-Inhalt zurück, kein <!DOCTYPE>, kein <html>, kein <body>."""
 }
 
 @app.route("/bewerten", methods=["POST"])
@@ -75,7 +93,7 @@ def bewerten():
         ]
     )
 
-    return jsonify({"bewertung": message.content[0].text})
+    return jsonify({"bewertung": message.content[0].text, "html": True})
 
 @app.route("/")
 def index():
