@@ -110,6 +110,7 @@ def md_to_html(text):
     return '\n'.join(result)
 
 
+@app.route("/bewerten", methods=["POST"])
 def bewerten():
     data = request.get_json()
     aufgabe = str(data.get("aufgabe", ""))
