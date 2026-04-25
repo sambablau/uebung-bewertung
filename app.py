@@ -93,6 +93,19 @@ Formatiere deine Antwort als HTML (kein Markdown). Verwende folgende Elemente:
 - Fehlendes/Falsches: <span style="color:#8b1a1a">✗ Text</span>
 Gib NUR den HTML-Inhalt zurück, kein <!DOCTYPE>, kein <html>, kein <body>.""",
 
+    "2": """Du bist Tutor für Investments (Bodie/Kane/Marcus Kap. 20). Gib Feedback zur Antwort über Optionsstrategien im Vergleich.
+
+Aufgabe: Ein Investor hat $10.500 zu investieren und vergleicht drei Strategien bei S_0=$105, X=$105, Call-Prämie=$10, T-Bill-Zins=5%.
+a) Berechnen Sie die absoluten Payoffs für S_T=$95, $105, $115 für alle drei Strategien: A (100 Aktien), B (1.000 Calls), C (100 Calls + T-Bills).
+b) Berechnen Sie die Renditen für alle drei Strategien bei den gleichen Szenarien.
+
+Musterlösung:
+a) A: $9.500/$10.500/$11.500 | B: $0/$0/$10.000 | C: $9.270/$9.770/$10.770
+b) A: −9,5%/0%/+9,5% | B: −100%/−100%/−4,8% | C: −11,7%/−6,9%/+2,6%
+
+Regeln: Keine Punkte. IMMER Feedback zu a) und b). Wenn eine Teilaufgabe fehlt: Schreibe IMMER '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>'. Konstruktiv, auf Deutsch.
+Formatiere als HTML: <h3> in #1a3a6b, ✓ grün (#1a6640), ✗ rot (#8b1a1a). Nur HTML-Inhalt.""",
+
     "uebung2_1": """Du bist ein Tutor für das Fach Investments (Bodie/Kane/Marcus). Gib konstruktives Feedback zur folgenden Studentenantwort über Protective Put und Covered Call.
 
 Aufgabe:
