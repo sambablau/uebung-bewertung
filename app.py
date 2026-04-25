@@ -14,20 +14,28 @@ client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 # ── E-Mail-Konfiguration ──────────────────────────────────────────────────────
 # Zum Deaktivieren: EMAIL_ENABLED auf "false" setzen im Render Dashboard
-EMAIL_ENABLED  = os.environ.get("EMAIL_ENABLED", "true").lower() == "true"
-EMAIL_FROM     = os.environ.get("EMAIL_FROM", "profdrfs@gmail.com")
-EMAIL_PASSWORD = os.environ.get("EMAIL_PASSWORD", "")
-EMAIL_TO       = os.environ.get("EMAIL_TO", "finance@wifa.uni-leipzig.de")
+# Variablen werden bei jedem Request neu gelesen (nicht nur beim Start)
 
 def send_notification(aufgabe, antwort, feedback_html):
     """Sendet E-Mail-Benachrichtigung an den Professor."""
-    if not EMAIL_ENABLED or not EMAIL_PASSWORD:
+    email_enabled  = os.environ.get("EMAIL_ENABLED", "true").lower() == "true"
+    email_from     = os.environ.get("EMAIL_FROM", "profdrfs@gmail.com")
+    email_password = os.environ.get("EMAIL_PASSWORD", "").replace(" ", "")
+    email_to       = os.environ.get("EMAIL_TO", "finance@wifa.uni-leipzig.de")
+
+    print(f"E-Mail-Status: enabled={email_enabled}, from={email_from}, to={email_to}, password_set={bool(email_password)}")
+
+    if not email_enabled:
+        print("E-Mail deaktiviert (EMAIL_ENABLED=false)")
+        return
+    if not email_password:
+        print("E-Mail-Fehler: EMAIL_PASSWORD nicht gesetzt")
         return
     try:
         msg = MIMEMultipart("alternative")
         msg["Subject"] = f"Feedback-Einreichung: {aufgabe} – {datetime.now().strftime('%d.%m.%Y %H:%M')}"
-        msg["From"]    = EMAIL_FROM
-        msg["To"]      = EMAIL_TO
+        msg["From"]    = email_from
+        msg["To"]      = email_to
 
         html_body = f"""
 <html><body style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;padding:20px">
@@ -50,8 +58,9 @@ def send_notification(aufgabe, antwort, feedback_html):
 
         msg.attach(MIMEText(html_body, "html", "utf-8"))
         with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(EMAIL_FROM, EMAIL_PASSWORD)
-            server.sendmail(EMAIL_FROM, EMAIL_TO, msg.as_string())
+            server.login(email_from, email_password)
+            server.sendmail(email_from, email_to, msg.as_string())
+        print(f"E-Mail erfolgreich gesendet an {email_to}")
     except Exception as e:
         print(f"E-Mail-Fehler: {e}")
 
@@ -68,13 +77,12 @@ a) X=$290: im Geld (Innenwert $5,71) | X=$300: aus dem Geld | X=$310: deutlich a
 b) Payoff=$8,00 | Netto-Gewinn=+$4,40 | Break-even=$303,60
 c) Stillhalter muss bei Ausübung Aktie zu $300 liefern. Max. Gewinn=$3,60 (Prämie). Verlustrisiko unbegrenzt.
 
-Wichtige Regeln für dein Feedback:
+Wichtige Regeln:
 - Vergib KEINE Punkte oder Noten
-- Wenn eine Teilfrage nicht beantwortet wurde, weise klar darauf hin und erkläre was erwartet wurde
+- Gib IMMER Feedback zu ALLEN drei Teilen a), b) und c) – auch wenn eine Teilfrage fehlt
+- Wenn eine Teilfrage fehlt: Schreibe IMMER explizit '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' und erkläre kurz was erwartet wurde
 - Mache KEINE Annahmen über fehlende Antworten – eine fehlende Antwort ist eine fehlende Antwort
-- Gib strukturiertes Feedback zu a), b) und c) – was ist richtig, was fehlt, was ist falsch
-- Sei konstruktiv, klar und ermutigend
-- Antworte auf Deutsch
+- Sei konstruktiv, klar und auf Deutsch
 
 Formatiere deine Antwort als HTML (kein Markdown). Verwende folgende Elemente:
 - Überschriften: <h3 style="color:#1a3a6b;font-size:15px;margin:1rem 0 .3rem">Titel</h3>
@@ -111,7 +119,7 @@ c) Protective Put schützt nach unten (Mindest-Payoff = X), lässt unbegrenzte G
 Wichtige Regeln:
 - Vergib KEINE Punkte oder Noten
 - Gib IMMER Feedback zu ALLEN drei Teilen a), b) und c) – auch wenn eine Teilfrage fehlt
-- Wenn eine Teilfrage fehlt: schreibe explizit "Diese Teilfrage wurde nicht beantwortet." und erkläre kurz was erwartet wurde
+- Wenn eine Teilfrage fehlt: Schreibe IMMER explizit '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' und erkläre kurz was erwartet wurde
 - Mache KEINE Annahmen über fehlende Antworten
 - Konstruktiv, klar, ermutigend, auf Deutsch
 
@@ -141,7 +149,7 @@ c) Straddle: Wette auf hohe Volatilität (egal ob rauf oder runter). Bullen-Spre
 Wichtige Regeln:
 - Vergib KEINE Punkte oder Noten
 - Gib IMMER Feedback zu ALLEN drei Teilen a), b) und c) – auch wenn eine Teilfrage fehlt
-- Wenn eine Teilfrage fehlt: schreibe explizit "Diese Teilfrage wurde nicht beantwortet." und erkläre kurz was erwartet wurde
+- Wenn eine Teilfrage fehlt: Schreibe IMMER explizit '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' und erkläre kurz was erwartet wurde
 - Mache KEINE Annahmen über fehlende Antworten
 - Konstruktiv, klar, ermutigend, auf Deutsch
 
@@ -168,7 +176,7 @@ b) Zerobond+Call ($117) überbewertet, Aktie+Put ($115) unterbewertet. Arbitrage
 Wichtige Regeln:
 - Vergib KEINE Punkte oder Noten
 - Gib IMMER Feedback zu BEIDEN Teilen a) und b) – auch wenn eine Teilfrage fehlt
-- Wenn eine Teilfrage fehlt: schreibe explizit "Diese Teilfrage wurde nicht beantwortet." und erkläre kurz was erwartet wurde
+- Wenn eine Teilfrage fehlt: Schreibe IMMER explizit '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' und erkläre kurz was erwartet wurde
 - Mache KEINE Annahmen über fehlende Antworten
 - Konstruktiv, klar, ermutigend, auf Deutsch
 
@@ -194,7 +202,7 @@ b) Emittent hat Call-Option (Rückkaufrecht zu Call Price). Investor ist short i
 Wichtige Regeln:
 - Vergib KEINE Punkte oder Noten
 - Gib IMMER Feedback zu BEIDEN Teilen a) und b) – auch wenn eine Teilfrage fehlt
-- Wenn eine Teilfrage fehlt: schreibe explizit "Diese Teilfrage wurde nicht beantwortet." und erkläre kurz was erwartet wurde
+- Wenn eine Teilfrage fehlt: Schreibe IMMER explizit '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' und erkläre kurz was erwartet wurde
 - Mache KEINE Annahmen über fehlende Antworten
 - Konstruktiv, klar, ermutigend, auf Deutsch
 
@@ -217,7 +225,7 @@ Musterlösung:
 a) Innerer Wert = max{$60−$50,0} = $10. Zeitwert = $17,67−$10 = $7,67.
 b) S↑→C↑, X↑→C↓, σ↑→C↑, T↑→C↑, r↑→C↑, D↑→C↓.
 
-Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile explizit benennen. Konstruktiv, auf Deutsch.
+Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung4_2": """Du bist ein Tutor für Investments (Bodie/Kane/Marcus, Kap. 21). Gib Feedback zur Antwort über Grenzen für Optionswerte.
@@ -230,7 +238,7 @@ Musterlösung:
 a) C≥0, C≤S₀, C≥S₀−PV(X). Untere Grenze = adjustierter innerer Wert.
 b) Call: lebend mehr wert als tot (Zeitwert aufgeben). C_amerikanisch=C_europäisch. Put: vorzeitige Ausübung kann optimal sein bei Insolvenz (Zeitwert des Geldes). C_amerikanisch>C_europäisch.
 
-Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile explizit benennen. Konstruktiv, auf Deutsch.
+Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung5_1": """Du bist ein Tutor für Investments (Bodie/Kane/Marcus, Kap. 21). Gib Feedback zur Antwort über das Binomialmodell.
@@ -243,7 +251,7 @@ Musterlösung:
 a) Su=$120→Cu=$10, Sd=$90→Cd=$0. H=(10−0)/(120−90)=1/3. Hedge: 1 Aktie−3 Calls. Payoff=$90 in beiden Fällen. PV=$81,82. $100−3C=$81,82 → C=$6,06.
 b) Verkauf 3 Calls (+$19,50), Kauf 1 Aktie (−$100), Leihe $80,50. Risikofreier Gewinn = $1,45 in beiden Szenarien.
 
-Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile explizit benennen. Konstruktiv, auf Deutsch.
+Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung5_2": """Du bist ein Tutor für Investments (Bodie/Kane/Marcus, Kap. 21). Gib Feedback zur Antwort über die Black-Scholes-Formel.
@@ -256,7 +264,7 @@ Musterlösung:
 a) d₁=0,43, d₂=0,18. C₀=$100×0,6664−$95×e^(−0,025)×0,5714=$66,64−$52,94=$13,70.
 b) P₀=C₀+X·e^(−rT)−S₀=$13,70+$92,65−$100=$6,35. Black-Scholes-Put: P₀=$95×0,9753×0,4286−$100×0,3336=$39,71−$33,36=$6,35.
 
-Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile explizit benennen. Konstruktiv, auf Deutsch.
+Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung6_1": """Du bist ein Tutor für Investments (Bodie/Kane/Marcus, Kap. 21). Gib Feedback zur Antwort über Delta, Elastizität und Portfolio Insurance.
@@ -269,7 +277,7 @@ Musterlösung:
 a) Delta_Call=N(d₁), Delta_Put=N(d₁)−1. Elastizität=Delta×(S/C)=0,6×24=14,4.
 b) Aktien=$40 Mio., T-Bills=$60 Mio. Verlust bei 2%: echt −$2Mio.+$1,2Mio.=−$0,8Mio.; synthetisch −2%×$40Mio.=−$0,8Mio.
 
-Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile explizit benennen. Konstruktiv, auf Deutsch.
+Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung6_2": """Du bist ein Tutor für Investments (Bodie/Kane/Marcus, Kap. 21). Gib Feedback zur Antwort über Delta-neutrales Hedging.
@@ -282,7 +290,7 @@ Musterlösung:
 a) 453 Aktien (=1.000×0,453). Kosten: $4.495+$40.770=$45.265.
 b) Delta-neutral: Gesamtdelta=0, kleine Kursschwankungen egal. Wette nur auf Volatilität. Nicht perfekt wegen Gamma: Delta ändert sich bei Kursbewegungen → Rebalancing nötig. Großes Gamma → häufiges Rebalancing.
 
-Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile explizit benennen. Konstruktiv, auf Deutsch.
+Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung7_1": """Du bist Tutor für Investments (Bodie/Kane/Marcus Kap. 22). Gib Feedback zur Antwort über Futures-Grundlagen.
