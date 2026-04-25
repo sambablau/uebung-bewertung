@@ -99,9 +99,11 @@ Aufgabe: Ein Investor hat $10.500 zu investieren und vergleicht drei Strategien 
 a) Berechnen Sie die absoluten Payoffs für S_T=$95, $105, $115 für alle drei Strategien: A (100 Aktien), B (1.000 Calls), C (100 Calls + T-Bills).
 b) Berechnen Sie die Renditen für alle drei Strategien bei den gleichen Szenarien.
 
-Musterlösung:
-a) A: $9.500/$10.500/$11.500 | B: $0/$0/$10.000 | C: $9.270/$9.770/$10.770
+Musterlösung (Lehrbuch: exakt 1.000 Calls à $10 = $10.000 investiert, restliche $500 in T-Bills):
+a) A: $9.500/$10.500/$11.500 | B (1.000 Calls): $0/$0/$10.000 | C (100 Calls + $9.500 T-Bills): $9.270/$9.770/$10.770
 b) A: −9,5%/0%/+9,5% | B: −100%/−100%/−4,8% | C: −11,7%/−6,9%/+2,6%
+
+Wichtig: Strategie B kauft exakt 1.000 Calls (=$10.000), nicht 1.050. Die restlichen $500 bleiben uninvestiert oder gehen in T-Bills je nach Aufgabenstellung im Lehrbuch.
 
 Regeln: Keine Punkte. IMMER Feedback zu a) und b). Wenn eine Teilaufgabe fehlt: Schreibe IMMER '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>'. Konstruktiv, auf Deutsch.
 Formatiere als HTML: <h3> in #1a3a6b, ✓ grün (#1a6640), ✗ rot (#8b1a1a). Nur HTML-Inhalt.""",
@@ -473,6 +475,15 @@ def bewerten():
 @app.route("/")
 def index():
     return "Server läuft."
+
+@app.route("/test-email")
+def test_email():
+    """Test-Endpunkt: Rufe /test-email im Browser auf um E-Mail zu testen."""
+    send_notification("TEST", "Dies ist eine Test-Einreichung.", "<p>Test-Feedback funktioniert.</p>")
+    email_enabled  = os.environ.get("EMAIL_ENABLED", "true").lower() == "true"
+    email_password = os.environ.get("EMAIL_PASSWORD", "").replace(" ", "")
+    return (f"EMAIL_ENABLED={email_enabled}, "
+            f"EMAIL_PASSWORD={'gesetzt (Länge=' + str(len(email_password)) + ')' if email_password else 'FEHLT'}")
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
