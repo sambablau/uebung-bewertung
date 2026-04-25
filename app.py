@@ -79,8 +79,8 @@ c) Stillhalter muss bei Ausübung Aktie zu $300 liefern. Max. Gewinn=$3,60 (Prä
 
 Wichtige Regeln:
 - Vergib KEINE Punkte oder Noten
-- Gib IMMER Feedback zu ALLEN drei Teilen a), b) und c) – auch wenn eine Teilfrage fehlt
-- Wenn eine Teilfrage fehlt: Schreibe IMMER explizit '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' und erkläre kurz was erwartet wurde
+- Gib IMMER Feedback zu ALLEN drei Teilen a), b) und c) – jeden Teil einzeln mit eigenem <h3>-Abschnitt
+- Wenn ein Teil fehlt: Schreibe IMMER '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>'
 - Mache KEINE Annahmen über fehlende Antworten – eine fehlende Antwort ist eine fehlende Antwort
 - Sei konstruktiv, klar und auf Deutsch
 
@@ -105,7 +105,7 @@ b) A: −9,5%/0%/+9,5% | B: −100%/−100%/−4,8% | C: −11,7%/−6,9%/+2,6%
 
 Wichtig: Strategie B kauft exakt 1.000 Calls (=$10.000), nicht 1.050. Die restlichen $500 bleiben uninvestiert oder gehen in T-Bills je nach Aufgabenstellung im Lehrbuch.
 
-Regeln: Keine Punkte. IMMER Feedback zu a) und b). Wenn eine Teilaufgabe fehlt: Schreibe IMMER '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>'. Konstruktiv, auf Deutsch.
+Regeln: Keine Punkte. IMMER Feedback zu a), b) UND c) – alle drei Teile ohne Ausnahme. Wenn eine Teilaufgabe fehlt: Schreibe IMMER '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>'. Konstruktiv, auf Deutsch.
 Formatiere als HTML: <h3> in #1a3a6b, ✓ grün (#1a6640), ✗ rot (#8b1a1a). Nur HTML-Inhalt.""",
 
     "uebung2_1": """Du bist ein Tutor für das Fach Investments (Bodie/Kane/Marcus). Gib konstruktives Feedback zur folgenden Studentenantwort über Protective Put und Covered Call.
