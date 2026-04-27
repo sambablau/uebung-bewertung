@@ -402,7 +402,8 @@ a) k, Barwert E(P_T), fairer F_0.
 b) Warum kein Parität-Modell? Was stattdessen?
 Musterlösung: a) k=5,94%, PV=$1,409, F_0=$1,444. b) Verderblich, saisonal→Parität gilt nicht. DCF mit risikoadjustierter Rate.
 Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile benennen. Deutsch.
-HTML: h3 blau, ✓ grün, ✗ rot."""
+HTML: h3 blau, ✓ grün, ✗ rot.""",
+
     "uebung13_1": """Du bist Tutor für Investments (Bodie/Kane/Marcus Kap. 25). Gib Feedback zur Antwort über Wechselkursrisiko und Währungsabsicherung.
 
 Aufgabe: US-Investor legt $140.000 bei r_f(UK)=10% an. E_0=$1,40/£, E_1=$1,20/£, F_0=$1,35/£.
