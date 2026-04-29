@@ -3,9 +3,7 @@ from flask_cors import CORS
 import anthropic
 import os
 import re
-import smtplib
-from email.mime.text import MIMEText
-from email.mime.multipart import MIMEMultipart
+import requests
 from datetime import datetime
 
 app = Flask(__name__)
@@ -14,30 +12,21 @@ CORS(app)
 client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
 def send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_text=""):
-    email_enabled  = os.environ.get("EMAIL_ENABLED", "true").lower() == "true"
-    email_from     = os.environ.get("EMAIL_FROM", "profdrfs@gmail.com")
-    email_password = os.environ.get("EMAIL_PASSWORD", "").replace(" ", "")
-    email_to       = os.environ.get("EMAIL_TO", "finance@wifa.uni-leipzig.de")
+    api_key  = os.environ.get("RESEND_API_KEY", "")
+    email_to = os.environ.get("EMAIL_TO", "finance@wifa.uni-leipzig.de")
 
-    if not email_enabled:
+    if not api_key:
+        print("E-Mail-Fehler: RESEND_API_KEY nicht gesetzt")
         return
-    if not email_password:
-        print("E-Mail-Fehler: EMAIL_PASSWORD nicht gesetzt")
-        return
-    try:
-        msg = MIMEMultipart("alternative")
-        msg["Subject"] = f"Feedback-Einreichung: {aufgabe_titel} – {datetime.now().strftime('%d.%m.%Y %H:%M')}"
-        msg["From"]    = email_from
-        msg["To"]      = email_to
 
-        aufgabe_block = (
-            f'<h3 style="color:#1a3a6b">Aufgabenstellung</h3>'
-            f'<div style="background:#e8eef8;border-left:4px solid #1a3a6b;padding:12px 16px;'
-            f'margin-bottom:20px;font-size:14px;white-space:pre-wrap">{aufgabe_text}</div>'
-            if aufgabe_text else ""
-        )
+    aufgabe_block = (
+        f'<h3 style="color:#1a3a6b">Aufgabenstellung</h3>'
+        f'<div style="background:#e8eef8;border-left:4px solid #1a3a6b;padding:12px 16px;'
+        f'margin-bottom:20px;font-size:14px;white-space:pre-wrap">{aufgabe_text}</div>'
+        if aufgabe_text else ""
+    )
 
-        html_body = f"""
+    html_body = f"""
 <html><body style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;padding:20px">
   <h2 style="color:#1a3a6b;border-bottom:2px solid #1a3a6b;padding-bottom:8px">
     Neue Feedback-Einreichung</h2>
@@ -57,11 +46,21 @@ def send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_text=""):
               padding:12px 16px;font-size:14px">{feedback_html}</div>
 </body></html>"""
 
-        msg.attach(MIMEText(html_body, "html", "utf-8"))
-        with smtplib.SMTP_SSL("smtp.gmail.com", 465) as server:
-            server.login(email_from, email_password)
-            server.sendmail(email_from, email_to, msg.as_string())
-        print(f"E-Mail erfolgreich gesendet an {email_to}")
+    try:
+        resp = requests.post(
+            "https://api.resend.com/emails",
+            headers={"Authorization": f"Bearer {api_key}", "Content-Type": "application/json"},
+            json={
+                "from": "Investments Feedback <onboarding@resend.dev>",
+                "to": [email_to],
+                "subject": f"Feedback-Einreichung: {aufgabe_titel} – {datetime.now().strftime('%d.%m.%Y %H:%M')}",
+                "html": html_body
+            }
+        )
+        if resp.status_code == 200 or resp.status_code == 201:
+            print(f"E-Mail erfolgreich gesendet an {email_to}")
+        else:
+            print(f"E-Mail-Fehler: {resp.status_code} – {resp.text}")
     except Exception as e:
         print(f"E-Mail-Fehler: {e}")
 
@@ -146,10 +145,8 @@ def index():
 @app.route("/test-email")
 def test_email():
     send_notification("TEST", "Dies ist eine Test-Einreichung.", "<p>Test-Feedback funktioniert.</p>")
-    email_enabled  = os.environ.get("EMAIL_ENABLED", "true").lower() == "true"
-    email_password = os.environ.get("EMAIL_PASSWORD", "").replace(" ", "")
-    return (f"EMAIL_ENABLED={email_enabled}, "
-            f"EMAIL_PASSWORD={'gesetzt (Länge=' + str(len(email_password)) + ')' if email_password else 'FEHLT'}")
+    api_key = os.environ.get("RESEND_API_KEY", "")
+    return f"RESEND_API_KEY={'gesetzt (Länge=' + str(len(api_key)) + ')' if api_key else 'FEHLT'}"
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5000)
