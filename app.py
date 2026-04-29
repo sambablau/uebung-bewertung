@@ -16,7 +16,7 @@ client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 # Zum Deaktivieren: EMAIL_ENABLED auf "false" setzen im Render Dashboard
 # Variablen werden bei jedem Request neu gelesen (nicht nur beim Start)
 
-def send_notification(aufgabe, antwort, feedback_html):
+def send_notification(aufgabe, antwort, feedback_html, aufgabe_text=""):
     """Sendet E-Mail-Benachrichtigung an den Professor."""
     email_enabled  = os.environ.get("EMAIL_ENABLED", "true").lower() == "true"
     email_from     = os.environ.get("EMAIL_FROM", "profdrfs@gmail.com")
@@ -37,6 +37,12 @@ def send_notification(aufgabe, antwort, feedback_html):
         msg["From"]    = email_from
         msg["To"]      = email_to
 
+        aufgabe_block = (
+            f'<h3 style="color:#1a3a6b">Aufgabenstellung</h3>'
+            f'<div style="background:#e8eef8;border-left:4px solid #1a3a6b;padding:12px 16px;'
+            f'margin-bottom:20px;font-size:14px;white-space:pre-wrap">{aufgabe_text}</div>'
+            if aufgabe_text else ""
+        )
         html_body = f"""
 <html><body style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;padding:20px">
   <h2 style="color:#1a3a6b;border-bottom:2px solid #1a3a6b;padding-bottom:8px">
@@ -48,6 +54,7 @@ def send_notification(aufgabe, antwort, feedback_html):
         <td style="padding:6px;font-weight:bold">Zeitpunkt:</td>
         <td style="padding:6px">{datetime.now().strftime('%d.%m.%Y um %H:%M Uhr')}</td></tr>
   </table>
+  {aufgabe_block}
   <h3 style="color:#1a3a6b">Antwort des Studierenden</h3>
   <div style="background:#f5f4f0;border-left:4px solid #c8c4bc;padding:12px 16px;
               margin-bottom:20px;white-space:pre-wrap;font-size:14px">{antwort}</div>
@@ -84,6 +91,8 @@ Wichtige Regeln:
 - Mache KEINE Annahmen über fehlende Antworten – eine fehlende Antwort ist eine fehlende Antwort
 - Sei konstruktiv, klar und auf Deutsch
 
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere deine Antwort als HTML (kein Markdown). Verwende folgende Elemente:
 - Überschriften: <h3 style="color:#1a3a6b;font-size:15px;margin:1rem 0 .3rem">Titel</h3>
 - Fettdruck: <strong>Text</strong>
@@ -98,14 +107,18 @@ Gib NUR den HTML-Inhalt zurück, kein <!DOCTYPE>, kein <html>, kein <body>.""",
 Aufgabe: Ein Investor hat $10.500 zu investieren und vergleicht drei Strategien bei S_0=$105, X=$105, Call-Prämie=$10, T-Bill-Zins=5%.
 a) Berechnen Sie die absoluten Payoffs für S_T=$95, $105, $115 für alle drei Strategien: A (100 Aktien), B (1.000 Calls), C (100 Calls + T-Bills).
 b) Berechnen Sie die Renditen für alle drei Strategien bei den gleichen Szenarien.
+c) Vergleichen Sie das Risikoprofil der drei Strategien: Welche bietet den größten Hebel? Was ist der Vorteil von Strategie C gegenüber B?
 
 Musterlösung (Lehrbuch: exakt 1.000 Calls à $10 = $10.000 investiert, restliche $500 in T-Bills):
 a) A: $9.500/$10.500/$11.500 | B (1.000 Calls): $0/$0/$10.000 | C (100 Calls + $9.500 T-Bills): $9.270/$9.770/$10.770
 b) A: −9,5%/0%/+9,5% | B: −100%/−100%/−4,8% | C: −11,7%/−6,9%/+2,6%
+c) B hat den größten Hebel (−100% bei kleiner Kursänderung). C begrenzt Verlust durch T-Bills, opfert aber Upside. A ist linear ohne Hebel.
 
 Wichtig: Strategie B kauft exakt 1.000 Calls (=$10.000), nicht 1.050. Die restlichen $500 bleiben uninvestiert oder gehen in T-Bills je nach Aufgabenstellung im Lehrbuch.
 
 Regeln: Keine Punkte. IMMER Feedback zu a), b) UND c) – alle drei Teile ohne Ausnahme. Wenn eine Teilaufgabe fehlt: Schreibe IMMER '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>'. Konstruktiv, auf Deutsch.
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere als HTML: <h3> in #1a3a6b, ✓ grün (#1a6640), ✗ rot (#8b1a1a). Nur HTML-Inhalt.""",
 
     "uebung2_1": """Du bist ein Tutor für das Fach Investments (Bodie/Kane/Marcus). Gib konstruktives Feedback zur folgenden Studentenantwort über Protective Put und Covered Call.
@@ -138,6 +151,8 @@ Wichtige Regeln:
 - Mache KEINE Annahmen über fehlende Antworten
 - Konstruktiv, klar, ermutigend, auf Deutsch
 
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere als HTML:
 - Überschriften: <h3 style="color:#1a3a6b;font-size:14px;font-weight:600;margin:1rem 0 .3rem">Titel</h3>
 - Fettdruck: <strong>Text</strong>
@@ -168,6 +183,8 @@ Wichtige Regeln:
 - Mache KEINE Annahmen über fehlende Antworten
 - Konstruktiv, klar, ermutigend, auf Deutsch
 
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere als HTML:
 - Überschriften: <h3 style="color:#1a3a6b;font-size:14px;font-weight:600;margin:1rem 0 .3rem">Titel</h3>
 - Fettdruck: <strong>Text</strong>
@@ -195,6 +212,8 @@ Wichtige Regeln:
 - Mache KEINE Annahmen über fehlende Antworten
 - Konstruktiv, klar, ermutigend, auf Deutsch
 
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere als HTML:
 - Überschriften: <h3 style="color:#1a3a6b;font-size:14px;font-weight:600;margin:1rem 0 .3rem">Titel</h3>
 - Fettdruck: <strong>Text</strong>
@@ -221,6 +240,8 @@ Wichtige Regeln:
 - Mache KEINE Annahmen über fehlende Antworten
 - Konstruktiv, klar, ermutigend, auf Deutsch
 
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere als HTML:
 - Überschriften: <h3 style="color:#1a3a6b;font-size:14px;font-weight:600;margin:1rem 0 .3rem">Titel</h3>
 - Fettdruck: <strong>Text</strong>
@@ -241,6 +262,8 @@ a) Innerer Wert = max{$60−$50,0} = $10. Zeitwert = $17,67−$10 = $7,67.
 b) S↑→C↑, X↑→C↓, σ↑→C↑, T↑→C↑, r↑→C↑, D↑→C↓.
 
 Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung4_2": """Du bist ein Tutor für Investments (Bodie/Kane/Marcus, Kap. 21). Gib Feedback zur Antwort über Grenzen für Optionswerte.
@@ -254,6 +277,8 @@ a) C≥0, C≤S₀, C≥S₀−PV(X). Untere Grenze = adjustierter innerer Wert.
 b) Call: lebend mehr wert als tot (Zeitwert aufgeben). C_amerikanisch=C_europäisch. Put: vorzeitige Ausübung kann optimal sein bei Insolvenz (Zeitwert des Geldes). C_amerikanisch>C_europäisch.
 
 Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung5_1": """Du bist ein Tutor für Investments (Bodie/Kane/Marcus, Kap. 21). Gib Feedback zur Antwort über das Binomialmodell.
@@ -267,6 +292,8 @@ a) Su=$120→Cu=$10, Sd=$90→Cd=$0. H=(10−0)/(120−90)=1/3. Hedge: 1 Aktie�
 b) Verkauf 3 Calls (+$19,50), Kauf 1 Aktie (−$100), Leihe $80,50. Risikofreier Gewinn = $1,45 in beiden Szenarien.
 
 Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung5_2": """Du bist ein Tutor für Investments (Bodie/Kane/Marcus, Kap. 21). Gib Feedback zur Antwort über die Black-Scholes-Formel.
@@ -280,6 +307,8 @@ a) d₁=0,43, d₂=0,18. C₀=$100×0,6664−$95×e^(−0,025)×0,5714=$66,64−
 b) P₀=C₀+X·e^(−rT)−S₀=$13,70+$92,65−$100=$6,35. Black-Scholes-Put: P₀=$95×0,9753×0,4286−$100×0,3336=$39,71−$33,36=$6,35.
 
 Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung6_1": """Du bist ein Tutor für Investments (Bodie/Kane/Marcus, Kap. 21). Gib Feedback zur Antwort über Delta, Elastizität und Portfolio Insurance.
@@ -293,6 +322,8 @@ a) Delta_Call=N(d₁), Delta_Put=N(d₁)−1. Elastizität=Delta×(S/C)=0,6×24=
 b) Aktien=$40 Mio., T-Bills=$60 Mio. Verlust bei 2%: echt −$2Mio.+$1,2Mio.=−$0,8Mio.; synthetisch −2%×$40Mio.=−$0,8Mio.
 
 Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung6_2": """Du bist ein Tutor für Investments (Bodie/Kane/Marcus, Kap. 21). Gib Feedback zur Antwort über Delta-neutrales Hedging.
@@ -306,6 +337,8 @@ a) 453 Aktien (=1.000×0,453). Kosten: $4.495+$40.770=$45.265.
 b) Delta-neutral: Gesamtdelta=0, kleine Kursschwankungen egal. Wette nur auf Volatilität. Nicht perfekt wegen Gamma: Delta ändert sich bei Kursbewegungen → Rebalancing nötig. Großes Gamma → häufiges Rebalancing.
 
 Regeln: Keine Punkte. IMMER Feedback zu a) und b). Fehlende Teile IMMER explizit mit dem Satz '<span style="color:#8b1a1a">✗ Diese Teilaufgabe wurde nicht beantwortet. Bitte vergessen Sie nicht, alle Teile der Aufgabe zu bearbeiten.</span>' kennzeichnen. Konstruktiv, auf Deutsch.
+- KRITISCH: Beziehe dich NUR auf das, was der Student tatsächlich geschrieben hat. Unterstelle NIEMALS etwas, das nicht explizit in der Studentenantwort steht – auch nicht als "Sie erwähnen zwar X, aber...".
+- Gib AUSSCHLIESSLICH reinen HTML-Inhalt zurück – KEIN Markdown, KEINE ```html-Blöcke, kein DOCTYPE, kein <html>, kein <body>.
 Formatiere als HTML mit blauen h3-Überschriften, grünem ✓ und rotem ✗.""",
 
     "uebung7_1": """Du bist Tutor für Investments (Bodie/Kane/Marcus Kap. 22). Gib Feedback zur Antwort über Futures-Grundlagen.
@@ -518,7 +551,14 @@ def bewerten():
     )
 
     feedback_html = md_to_html(message.content[0].text)
-    send_notification(aufgabe, antwort, feedback_html)
+    # Aufgabenstellung für E-Mail extrahieren (erste 3 Zeilen nach "Aufgabe:")
+    prompt_text = PROMPTS.get(aufgabe, "")
+    aufgabe_text = ""
+    if "Aufgabe:" in prompt_text:
+        start = prompt_text.index("Aufgabe:") + len("Aufgabe:")
+        end = prompt_text.find("Musterlösung:", start)
+        aufgabe_text = prompt_text[start:end].strip() if end > 0 else prompt_text[start:start+600].strip()
+    send_notification(aufgabe, antwort, feedback_html, aufgabe_text)
     return jsonify({"bewertung": feedback_html, "html": True})
 
 @app.route("/")
