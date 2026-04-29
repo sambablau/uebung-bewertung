@@ -11,7 +11,7 @@ CORS(app)
 
 client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
-def send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_text=""):
+def send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_text="", dateiname=""):
     api_key  = os.environ.get("RESEND_API_KEY", "")
     email_to = os.environ.get("EMAIL_TO", "finance@wifa.uni-leipzig.de")
 
@@ -53,7 +53,7 @@ def send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_text=""):
             json={
                 "from": "Investments Feedback <onboarding@resend.dev>",
                 "to": [email_to],
-                "subject": f"Feedback-Einreichung: {aufgabe_titel} – {datetime.now().strftime('%d.%m.%Y %H:%M')}",
+                "subject": f"Investments {dateiname} – {aufgabe_titel} – {datetime.now().strftime('%d.%m.%Y %H:%M')}",
                 "html": html_body
             }
         )
@@ -108,6 +108,7 @@ def bewerten():
     aufgabe_html = (data.get("aufgabe") or "").strip()
     muster_html  = (data.get("musterloesung") or "").strip()
     aufgabe_titel = (data.get("titel") or "Offene Aufgabe").strip()
+    dateiname     = (data.get("dateiname") or "").strip()
 
     if not antwort or len(antwort) < 20:
         return jsonify({"error": "Bitte eine ausführlichere Antwort eingeben."}), 400
@@ -134,7 +135,7 @@ Antwort des Studenten:
     )
 
     feedback_html = message.content[0].text
-    send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_html)
+    send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_html, dateiname)
     return jsonify({"bewertung": feedback_html, "html": True})
 
 
