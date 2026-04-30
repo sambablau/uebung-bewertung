@@ -11,7 +11,7 @@ CORS(app)
 
 client = anthropic.Anthropic(api_key=os.environ.get("ANTHROPIC_API_KEY"))
 
-def send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_text=""):
+def send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_text="", muster_text=""):
     api_key  = os.environ.get("RESEND_API_KEY", "")
     email_to = os.environ.get("EMAIL_TO", "dr.fs@me.com")
 
@@ -26,6 +26,13 @@ def send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_text=""):
         if aufgabe_text else ""
     )
 
+    muster_block = (
+        f'<h3 style="color:#1a3a6b">Musterlösung</h3>'
+        f'<div style="background:#e8f5ee;border-left:4px solid #a3d4b8;padding:12px 16px;'
+        f'margin-bottom:20px;font-size:14px;white-space:pre-wrap">{muster_text}</div>'
+        if muster_text else ""
+    )
+
     html_body = f"""
 <html><body style="font-family:Arial,sans-serif;max-width:700px;margin:0 auto;padding:20px">
   <h2 style="color:#1a3a6b;border-bottom:2px solid #1a3a6b;padding-bottom:8px">
@@ -38,6 +45,7 @@ def send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_text=""):
         <td style="padding:6px">{datetime.now().strftime('%d.%m.%Y um %H:%M Uhr')}</td></tr>
   </table>
   {aufgabe_block}
+  {muster_block}
   <h3 style="color:#1a3a6b">Antwort des Studierenden</h3>
   <div style="background:#f5f4f0;border-left:4px solid #c8c4bc;padding:12px 16px;
               margin-bottom:20px;white-space:pre-wrap;font-size:14px">{antwort}</div>
@@ -104,9 +112,9 @@ def strip_html(html):
 @app.route("/bewerten", methods=["POST"])
 def bewerten():
     data = request.get_json()
-    antwort      = (data.get("antwort") or "").strip()
-    aufgabe_html = (data.get("aufgabe") or "").strip()
-    muster_html  = (data.get("musterloesung") or "").strip()
+    antwort       = (data.get("antwort") or "").strip()
+    aufgabe_html  = (data.get("aufgabe") or "").strip()
+    muster_html   = (data.get("musterloesung") or "").strip()
     aufgabe_titel = (data.get("titel") or "Offene Aufgabe").strip()
 
     if not antwort or len(antwort) < 20:
@@ -114,8 +122,8 @@ def bewerten():
     if not aufgabe_html:
         return jsonify({"error": "Aufgabenstellung fehlt."}), 400
 
-    aufgabe_text  = strip_html(aufgabe_html)
-    muster_text   = strip_html(muster_html) if muster_html else ""
+    aufgabe_text = strip_html(aufgabe_html)
+    muster_text  = strip_html(muster_html) if muster_html else ""
 
     user_message = f"""Aufgabenstellung:
 {aufgabe_text}
@@ -134,7 +142,7 @@ Antwort des Studenten:
     )
 
     feedback_html = message.content[0].text
-    send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_html)
+    send_notification(aufgabe_titel, antwort, feedback_html, aufgabe_html, muster_html)
     return jsonify({"bewertung": feedback_html, "html": True})
 
 
